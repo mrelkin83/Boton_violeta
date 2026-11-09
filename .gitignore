@@ -1,0 +1,36 @@
+# ==============================================================================
+# Botón Violeta — exclusiones de control de versiones
+# CLAUDE.md §11.1.5 · prohibición 15
+# ==============================================================================
+
+# Secretos: NUNCA en el repositorio
+config.php
+.env
+
+# Volcados y respaldos de base de datos
+*.sql.gz
+*.dump
+/backups/
+/almacen/
+
+# Datos operativos y de personas
+/logs/
+/sessions/
+/cache/
+/uploads/
+
+# Documentación interna de trabajo (decisión de Elkin, 9/11/2026)
+/docs/
+
+# Capturas y adjuntos sueltos que llegan por mensajería
+*.jpeg
+
+# Sistema operativo y editores
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Nota: bd/migraciones/*.sql SÍ se versiona (es código de esquema, no datos).
+# Cualquier .sql con INSERT de datos reales queda prohibido en el árbol.
