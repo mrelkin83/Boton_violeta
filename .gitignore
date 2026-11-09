@@ -25,6 +25,31 @@ config.php
 # Capturas y adjuntos sueltos que llegan por mensajería
 *.jpeg
 
+# ------------------------------------------------------------------------------
+# DOCUMENTACIÓN INTERNA  (repositorio público, decisión de Elkin 9/11/2026)
+# ------------------------------------------------------------------------------
+# Los informes de fase, la auditoría forense y el CLAUDE.md enumeran los
+# hallazgos H-02…H-27 con archivo y línea, el modelo de amenazas y los
+# controles pendientes. El servidor está vivo en una IP conocida: publicarlos
+# es publicar cómo atacarlo. Es el mismo motivo por el que el .htaccess
+# deniega los .md desde el 2/09/2026.
+#
+# Se excluye TODO .md y .txt de la raíz salvo README.md, para que un informe
+# nuevo quede cubierto sin tener que acordarse de añadirlo aquí.
+/*.md
+!/README.md
+/*.txt
+
+# ------------------------------------------------------------------------------
+# DOCUMENTOS INSTITUCIONALES
+# ------------------------------------------------------------------------------
+# No son secretos (son normativa oficial), pero pesan ~70 MB y en git quedan
+# en el historial para siempre aunque después se borren. Se comparten por
+# Drive, no por el repositorio.
+*.pdf
+*.docx
+/actualizacion/
+
 # Sistema operativo y editores
 Thumbs.db
 .DS_Store
