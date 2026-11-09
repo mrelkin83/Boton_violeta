@@ -1,0 +1,57 @@
+-- =============================================================================
+-- PLANTILLA · Catálogo de unidades académicas
+-- =============================================================================
+-- ⚠ ESTO NO ES UNA MIGRACIÓN. No se ejecuta automáticamente y no lleva número.
+--
+-- La estructura académica real de la Universidad Distrital —sus sedes,
+-- facultades y proyectos curriculares— es un dato institucional. Sembrarlo
+-- desde el desarrollo sería inventar información que después determina
+-- QUIÉN INVESTIGA UN CASO DE VIOLENCIA DE GÉNERO. Por eso se deja plantilla
+-- y no contenido (CLAUDE.md §1: «Nunca inventes normativa»).
+--
+-- Quién debe llenarla: Oficina de Bienestar Universitario, con la estructura
+-- oficial vigente. Es además la decisión 3 del §13.1 de CLAUDE.md.
+--
+-- Por qué importa (ADR-04): la competencia disciplinaria sigue al proyecto
+-- curricular de la persona denunciada. Un catálogo incompleto significa casos
+-- que no se pueden enrutar a la instancia competente.
+-- =============================================================================
+
+-- ─── 1. SEDES ───────────────────────────────────────────────────────────────
+-- INSERT INTO `unidades` (`tipo`, `padre_id`, `codigo`, `nombre`) VALUES
+--   ('sede', NULL, 'SEDE-XXX', 'Nombre oficial de la sede');
+
+-- ─── 2. FACULTADES  (padre_id = id de la sede) ──────────────────────────────
+-- INSERT INTO `unidades` (`tipo`, `padre_id`, `codigo`, `nombre`) VALUES
+--   ('facultad', <id_sede>, 'FAC-XXX', 'Nombre oficial de la facultad');
+
+-- ─── 3. PROYECTOS CURRICULARES  (padre_id = id de la facultad) ──────────────
+-- Es el nivel que determina la competencia estudiantil: Consejo de Carrera
+-- del proyecto curricular de la persona denunciada (Ac. 027/1993 art. 86).
+-- INSERT INTO `unidades` (`tipo`, `padre_id`, `codigo`, `nombre`) VALUES
+--   ('proyecto_curricular', <id_facultad>, 'PC-XXX', 'Nombre del proyecto curricular');
+
+-- ─── 4. DEPENDENCIAS ADMINISTRATIVAS ────────────────────────────────────────
+-- Para casos cuya persona denunciada es personal administrativo o contratista.
+-- INSERT INTO `unidades` (`tipo`, `padre_id`, `codigo`, `nombre`) VALUES
+--   ('dependencia', NULL, 'DEP-XXX', 'Nombre de la dependencia');
+
+-- =============================================================================
+-- Verificación tras la carga
+-- =============================================================================
+--   SELECT tipo, COUNT(*) FROM unidades GROUP BY tipo;
+--
+--   -- Jerarquía completa, para revisarla a ojo:
+--   SELECT s.nombre AS sede, f.nombre AS facultad, p.nombre AS proyecto_curricular
+--     FROM unidades p
+--     LEFT JOIN unidades f ON p.padre_id = f.id
+--     LEFT JOIN unidades s ON f.padre_id = s.id
+--    WHERE p.tipo = 'proyecto_curricular'
+--    ORDER BY s.nombre, f.nombre, p.nombre;
+--
+--   -- Ningún proyecto curricular debe quedar huérfano:
+--   SELECT * FROM unidades WHERE tipo = 'proyecto_curricular' AND padre_id IS NULL;
+--
+-- Después de cargar el catálogo, asignar `usuarios.unidad_id` a cada cuenta
+-- con rol `unidad_academica`: sin ese vínculo el rol no tiene alcance y no
+-- verá ninguna orden de medida (RN-08).

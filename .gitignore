@@ -13,6 +13,13 @@ config.php
 /backups/
 /almacen/
 
+# Copias de seguridad de archivos fuente (prohibición §16.15). El .htaccess
+# ya las deniega por HTTP; tampoco deben versionarse: son código viejo que
+# nadie revisa y que puede traer de vuelta un defecto ya corregido.
+*.backup
+*.bak
+*.old
+
 # Datos operativos y de personas
 /logs/
 /sessions/

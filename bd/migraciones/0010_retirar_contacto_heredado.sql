@@ -1,0 +1,42 @@
+-- =============================================================================
+-- Migración 0010 · Retirar la columna heredada `denunciante_contacto`
+-- =============================================================================
+-- Fase:   2 · Seguimiento seguro
+-- Estado: NO EJECUTAR hasta verificar el resultado de 0009
+--
+-- `denunciante_contacto` guarda el teléfono y el correo concatenados EN CLARO.
+-- Una vez que 0009 los ha separado y cifrado, esta columna es una copia sin
+-- cifrar de los datos que más protección necesitan.
+--
+-- ─── VERIFICACIÓN OBLIGATORIA ANTES DE EJECUTAR ─────────────────────────────
+--
+-- 1. Ninguna fila con contacto debe haber quedado sin cifrar:
+--
+--      SELECT COUNT(*) AS pendientes FROM denuncias
+--       WHERE denunciante_contacto IS NOT NULL
+--         AND denunciante_contacto <> ''
+--         AND denunciante_correo_cifrado IS NULL
+--         AND denunciante_telefono_cifrado IS NULL;
+--
+--    Debe devolver 0. Si devuelve más, son filas de las que 0009 no pudo
+--    extraer ningún contacto: revisarlas UNA POR UNA antes de continuar.
+--    Cada una es una persona a la que la Universidad perdería la forma de
+--    contactar.
+--
+-- 2. El descifrado debe funcionar sobre una muestra real:
+--
+--      BV_CONFIG=... php -r "define('BASE_PATH','.'); require 'init.php';
+--        foreach (db_select('SELECT codigo, denunciante_correo_cifrado FROM denuncias
+--                            WHERE denunciante_correo_cifrado IS NOT NULL LIMIT 10') as \$d)
+--          echo \$d['codigo'], ' -> ',
+--               enmascarar_contacto(descifrar_contacto(\$d['denunciante_correo_cifrado']), 'correo'), PHP_EOL;"
+--
+-- 3. Respaldo completo de la tabla `denuncias`.
+--
+-- ⚠ Esta operación NO es reversible: los datos en claro desaparecen y solo
+--   quedan los cifrados. Si ENCRYPTION_KEY se pierde, el contacto se pierde.
+--   Confirmar antes que la clave está respaldada en un lugar seguro y separado
+--   de la base de datos.
+-- =============================================================================
+
+ALTER TABLE `denuncias` DROP COLUMN `denunciante_contacto`;
